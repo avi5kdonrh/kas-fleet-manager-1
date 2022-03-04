@@ -87,7 +87,9 @@ func (h kafkaHandler) Create(w http.ResponseWriter, r *http.Request) {
 			if svcErr != nil {
 				return nil, svcErr
 			}
-			return presenters.PresentKafkaRequest(convKafka), nil
+			profile := h.kafkaConfig.SupportedKafkaSizes.SupportedKafkaSizesConfig.SupportedKafkaProfiles.GetById("standard")
+			size := profile.Sizes.GetById("x1")
+			return presenters.PresentKafkaRequest(convKafka, &size), nil
 		},
 	}
 
@@ -104,7 +106,10 @@ func (h kafkaHandler) Get(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				return nil, err
 			}
-			return presenters.PresentKafkaRequest(kafkaRequest), nil
+			kafkaConfig := h.kafkaConfig
+			profile := kafkaConfig.SupportedKafkaSizes.SupportedKafkaSizesConfig.SupportedKafkaProfiles.GetById("standard")
+			size := profile.Sizes.GetById("x1")
+			return presenters.PresentKafkaRequest(kafkaRequest, &size), nil
 		},
 	}
 	handlers.HandleGet(w, r, cfg)
@@ -152,7 +157,9 @@ func (h kafkaHandler) List(w http.ResponseWriter, r *http.Request) {
 			}
 
 			for _, kafkaRequest := range kafkaRequests {
-				converted := presenters.PresentKafkaRequest(kafkaRequest)
+				profile := h.kafkaConfig.SupportedKafkaSizes.SupportedKafkaSizesConfig.SupportedKafkaProfiles.GetById("standard")
+				size := profile.Sizes.GetById("x1")
+				converted := presenters.PresentKafkaRequest(kafkaRequest, &size)
 				kafkaRequestList.Items = append(kafkaRequestList.Items, converted)
 			}
 
@@ -202,8 +209,9 @@ func (h kafkaHandler) Update(w http.ResponseWriter, r *http.Request) {
 					return nil, updateErr
 				}
 			}
-
-			return presenters.PresentKafkaRequest(kafkaRequest), nil
+			profile := h.kafkaConfig.SupportedKafkaSizes.SupportedKafkaSizesConfig.SupportedKafkaProfiles.GetById("standard")
+			size := profile.Sizes.GetById("x1")
+			return presenters.PresentKafkaRequest(kafkaRequest, &size), nil
 		},
 	}
 	handlers.Handle(w, r, cfg, http.StatusOK)
